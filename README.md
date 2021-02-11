@@ -480,21 +480,21 @@ tar -zxf consul-template_*.tgz
 
 PgBouncer Kurulumu:
 ```sh
-sudo yum install epel-release
-sudo yum install pgbouncer
+sudo yum install epel-release -y
+sudo yum install pgbouncer -y
 ```
 
-Aşağıdaki komut herhangi bir patroni makinasında çalıştırılarak çıktısı *userlist.txt* dosyasına yazılır. 
+Aşağıdaki komut herhangi bir patroni makinasında çalıştırılarak çıktısı *userlist.txt* dosyasına eklenir. 
 ````sql
 select rolname,rolpassword from pg_authid where rolname='postgres';
 ````
 
 örnek: 
 ```sh
-cat /etc/pgbouncer/userlist.txt >> "postgres" "md53175bce1d3201d16594cebf9d7eb3f9d"
+"postgres" "md53175bce1d3201d16594cebf9d7eb3f9d"
 ```
 
-ve pgBouncer servisi başlatılır.
+pgBouncer servisi başlatılır.
 ```sh
 service pgbouncer start
 ```
@@ -504,7 +504,7 @@ PgBouncer kurulumu yapıldıktan sonra */etc/pgbouncer/pgbouncer.ini* dosyasın�
 */etc/pgbouncer/* altında ``pgbouncer.ini.tmpl`` dosyasını yaratıp aşağıda verilen template'i kopyalayın. 
 ```go
 [databases]
-{{with $service := "postgres" }}{{with $leader := keyOrDefault (printf "service/%s/leader" $service) "NONE"}}{{if ne $leader "NONE"}}{{with $data := key (printf "pg_cluster/%s/members/%s" $service $leader) | parseJSON}}{{with $host_port := (index (index ($data.conn_url | split "://") 1 | split "/") 0) | split ":"}}* = host={{index $host_port 0}} port={{index $host_port 1}}{{end}}{{end}}{{end}}{{end}}{{end}}
+{{with $service := "postgres" }}{{with $leader := keyOrDefault (printf "service/%s/leader" $service) "NONE"}}{{if ne $leader "NONE"}}{{with $data := key (printf "service/%s/members/%s" $service $leader) | parseJSON}}{{with $host_port := (index (index ($data.conn_url | split "://") 1 | split "/") 0) | split ":"}}* = host={{index $host_port 0}} port={{index $host_port 1}}{{end}}{{end}}{{end}}{{end}}{{end}}
 
 [pgbouncer]
 listen_port = 6432
@@ -536,12 +536,11 @@ template {
   source      = "/etc/pgbouncer/pgbouncer.ini.tmpl"
   destination = "/etc/pgbouncer/pgbouncer.ini"
   perms       = 0644
-  command     = "/bin/bash -c 'service pgbouncer reload'"
+  command     = "/bin/bash -c 'systemctl reload pgbouncer.service'"
 }
 ```
 
 consul-template'i çalıştırmak için: 
-
 ```sh
 /opt/consul-template -config=consul-template-config.hcl
 ```
