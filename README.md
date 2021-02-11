@@ -469,7 +469,7 @@ sudo patronictl -c /opt/app/patroni/etc/postgresql.yml pause
 Consul-template aracı consul binary paketiyle birlikte gelmez. Ayrı ayrı kurulmaları gerekir. Bu yüzden önce pgBouncer makinasına consul client kurulumu yapılır. PgBouncer consul cluster ile iletişimi local agent aracılığıyla yapar.   
 
 ## PgBouncer + Consul + Consul-template Yapısı
-![PgBouncer + Consul + Consul-template Yapısı](/Patroni-2.png)
+![PgBouncer + Consul + Consul-template Yapısı](/patroni-2.png)
 
 consul-template kurulumu:
 ```sh
