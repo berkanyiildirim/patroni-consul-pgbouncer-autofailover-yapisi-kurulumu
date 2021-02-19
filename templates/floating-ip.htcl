@@ -1,0 +1,15 @@
+consul {
+  address = "127.0.0.1:8500"
+
+  retry {
+    enabled  = true
+    attempts = 12
+    backoff  = "250ms"
+  }
+}
+template {
+  source      = "/opt/floating-ip.tmpl"
+  destination = "/home/vagrant/floating-ip.txt"
+  perms       = 0644
+  command     = "/bin/bash -c './floating-ip.sh'"
+}

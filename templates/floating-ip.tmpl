@@ -1,0 +1,8 @@
+{{with $service := "postgres" }}
+    {{with $leader := keyOrDefault (printf "service/%s/leader" $service) "NONE"}}
+        {{if eq $leader "pg-patroni1"}}
+HasFloting IP = true
+        {{else}}
+HasFloting IP = false {{end}}
+    {{end}} 
+{{end}} 
