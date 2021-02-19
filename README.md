@@ -170,3 +170,9 @@ consul-template'i çalıştırmak için:
 
 Consul-template'in çalışmasıyla herbir makinanın home dizininde oluşturulan `floating-ip.txt` dosyasına bakarak gezen ip'ye sahip olup olmadığını görebilirsiniz. Gezen ip'yi gözlemlemek için `ip a | grep 'inet '` komutu da faydalı olabilir.
 
+---
+
+## Yapıya Eklenmesi Planlanan Özellikler
+
+- [ ] pgBackRest entegrasyonu
+- [ ] Varolan cluster ve varolan single node entegrasyonu
