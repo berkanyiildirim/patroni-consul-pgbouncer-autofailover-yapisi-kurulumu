@@ -45,7 +45,7 @@ Ayrıca Consul IU arayüzüne kurulan node'ların herhangi birinin IP'si ile eri
 
 Patroni ve pgBouncer kurulan node'larda consul cluster ile iletişimi "Consul Client" yapar. Böylece Patroni ve pgBouncer daima local agentlar ile konuşur ve consul clusterında oluşabilecek failover işlemlerinden etkilenmez. Single-point-of-failure önlenir.
 
-Herbir Patroni ve pgBoucner makinalarına `install_consul-client.sh` ile consul kurulum yapılır, consul'ü client modda ayarlamak için `setup_consul-client.sh` script dosyası çalıştırılır. Bu dosya çalıştırılmadan önce `node_name` ve `bind_addr` alanları kurulum yapılan herbir node için spesifik olarak ayarlanmalıdır. Herbir consul client için "encrypt" key değeri consul cluster kurulumdaki key değeri ile aynı olmalıdır.
+Herbir Patroni ve pgBoucner makinalarına [`install_consul-client.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/consul/install_consul-client.sh) ile consul kurulum yapılır, consul'ü client modda ayarlamak için [`setup_consul-client.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/consul/setup_consul-client.sh) script dosyası çalıştırılır. Bu dosya çalıştırılmadan önce `node_name` ve `bind_addr` alanları kurulum yapılan herbir node için spesifik olarak ayarlanmalıdır. Herbir consul client için "encrypt" key değeri consul cluster kurulumdaki key değeri ile aynı olmalıdır.
 
 Test dışı ve farklı IP'li kurulumlarda, kurulan consul cluster IP'lerini belirten `retry_join` alanını değiştirdiğinizden emin olun.
 
@@ -80,7 +80,7 @@ ssh-keygen -t rsa -b 4096 -C "your_email@domain.com"
 ssh-copy-id root@server_ip_address
 ```
 
-`install_pg.sh` ve `install_patroni.sh` script dosyaları ile herbir patroni makinasında PostgreSQL ve Patroni kurulumu yapılır. `setup_patroni.sh` ile de patroni konfigürasyonları yapılır. Bu script dosyasını kullanırken `NODEIP` ve `NAME` değişkenlerinin kurulum yapılan makinaya özel olarak ayarladığınızdan emin olun.
+[`install_pg.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/postgres/install_pg.sh) ve [`install_patroni.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/patroni/install_patroni.sh) script dosyaları ile herbir patroni makinasında PostgreSQL ve Patroni kurulumu yapılır. `setup_patroni.sh` ile de patroni konfigürasyonları yapılır. Bu script dosyasını kullanırken `NODEIP` ve `NAME` değişkenlerinin kurulum yapılan makinaya özel olarak ayarladığınızdan emin olun.
 
 Herbir makinada kurulum yapıldıktan sonra sırayla Patroni servisleri başlatılır. Patroni clusterı başlatılmadan önce consul clusterının sağlıklo çalıştığından emin olun.
 ```sh
@@ -124,11 +124,11 @@ sudo patronictl -c /opt/app/patroni/etc/postgresql.yml pause
 ## PgBouncer ve Consul-template Kurulumu
 
 Consul-template aracı consul binary paketiyle birlikte gelmez. Ayrı ayrı kurulmaları gerekir. Bu yüzden önce pgBouncer makinasına consul client kurulumu yapılır. PgBouncer, consul cluster ile bu local agent üzerinden konuşur. PgBouncer + Consul + Consul-template çalışma yapısı şu şekildedir: 
-![PgBouncer + Consul + Consul-template Yapısı](/images/pgbouncer-consul.png)
+![PgBouncer + Consul + Consul-template Yapısı](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/images/pgbouncer-consul.png)
 
-PgBouncer ve consul-template kurulum scriptleri `install_pgbouncer.sh` ve `install_consul-template.sh` dosyalarında verilmiştir.
+PgBouncer ve consul-template kurulum scriptleri [`install_pgbouncer.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/pgbouncer/install_pgbouncer.sh) ve [`install_consul-template.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/pgbouncer/install_consul-template.sh) dosyalarında verilmiştir.
 
-PgBouncer authentication için aşağıdaki komut herhangi bir patroni makinasında çalıştırılarak çıktısı [`userlist.txt`](/scripts/userlist.txt) dosyasına eklenir. 
+PgBouncer authentication için aşağıdaki komut herhangi bir patroni makinasında çalıştırılarak çıktısı oluşturulan [`userlist.txt`] dosyasına eklenir. 
 ````sql
 select rolname,rolpassword from pg_authid where rolname='postgres';
 ````
@@ -146,7 +146,7 @@ service pgbouncer enable
 
 PgBouncer kurulumu yapıldıktan sonra */etc/pgbouncer/pgbouncer.ini* dosyasını render edecek consul-template şablonu oluşturulur. Bu şablon consul clusterdaki patroni verilerini tutan `postgres` servisini izler, lider değişiminde *pgbouncer.ini* dosyasında IP ve port değerlerini dinamik olarak değiştirir. **Kurulan bu yapıyla yapılan testlerde Patroni failover sırasında uygulamadan gelen istekler 15-20 saniyelik aksaklıktan sonra sorunsuz devam etmiştir.**
 
-*/etc/pgbouncer/* altında `pgbouncer.ini.tmpl` isimli bir template dosyası yaratılıp [burada](/templates/pgbouncer.ini.tmpl) verilen içerik kopyalanır. Bu local consul agent ile konuşan consul-template'in pgBouncer konfigürasyon dosyasını değiştirken kullanacağı şablondur. Consul-template, parametreleri [*consul-template-config.hcl*](/templates/consul-template-config.hcl) dosyasında verilerek çalıştırılır. 
+*/etc/pgbouncer/* altında `pgbouncer.ini.tmpl` isimli bir template dosyası yaratılıp [burada](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/templates/pgbouncer.ini.tmpl) verilen içerik kopyalanır. Bu local consul agent ile konuşan consul-template'in pgBouncer konfigürasyon dosyasını değiştirken kullanacağı şablondur. Consul-template, parametreleri [`consul-template-config.hcl`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/templates/consul-template-config.hcl) dosyasında verilerek çalıştırılır. 
 
 consul-template'i çalıştırmak için: 
 ```sh
@@ -159,9 +159,9 @@ Buraya kadar yapılan kurulum ve ayarlamalar ile Patroni-pgBouncer-Consul yapıs
 
 Verilen script dosyalarında gezen ip değeri consul üzerinde bir key-value olarak */service/postgres/floating-ip* 'de tutulmaktadır. Consul üzerine key-value değeri eklemek için consul UI veya [`consul kv put`](https://www.consul.io/commands/kv/put) komutunu kullanabilirsiniz.
 
-Floating IP'nin yapıya eklenmesi için ilk olarak Patroni clusterı içindeki makinalarda consul-template kurulumu yapılır. Kurulum script [dosyası](install_consul-template.sh). 
+Floating IP'nin yapıya eklenmesi için ilk olarak Patroni clusterı içindeki makinalarda consul-template kurulumu yapılır. Kurulum script [dosyası](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/consul/install_consul-template.sh). 
 
-Kurulum ve gezen ip değerinin consule eklenmesi yapıldıktan sonra /opt altında `floating-ip.tmpl` şablon dosyası oluşurulup içeriği consulden o an ki lideri sorgulacak şekilde ayarlanır. [floating-ip.tmpl]() şablonundaki "{{if eq $leader "pg-patroni1"}}" bloğunu kurulum yapacağınız herbir makina için değiştirdiğinizden emin olun. Daha sonra her lider değişiminde consul-template'in çalıştıracağı [`floating-ip.sh`]() script dosyası oluşturulur. Bu script ile sadece liderin gezen ip'ye sahip olması sağlanır. Son olarak consul-template'in çalışma parametrelerini verdiğimiz `floating-ip.htcl` dosyası oluşturulup herbir makinada çalıştırılır.
+Kurulum ve gezen ip değerinin consule eklenmesi yapıldıktan sonra /opt altında [floating-ip.tmpl](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/templates/floating-ip.tmpl) şablon dosyası oluşurulup içeriği consulden o an ki lideri sorgulacak şekilde ayarlanır. floating-ip.tmpl şablonundaki "{{if eq $leader "pg-patroni1"}}" bloğunu kurulum yapacağınız herbir makina için değiştirdiğinizden emin olun. Daha sonra her lider değişiminde consul-template'in çalıştıracağı [`floating-ip.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/floating-ip.sh) script dosyası oluşturulur. Bu script ile sadece liderin gezen ip'ye sahip olması sağlanır. Son olarak consul-template'in çalışma parametrelerini verdiğimiz [`floating-ip.htcl`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/templates/floating-ip.htcl) dosyası oluşturulup herbir makinada çalıştırılır.
 
 consul-template'i çalıştırmak için: 
 ```sh
