@@ -80,7 +80,7 @@ ssh-keygen -t rsa -b 4096 -C "your_email@domain.com"
 ssh-copy-id root@server_ip_address
 ```
 
-[`install_pg.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/postgres/install_pg.sh) ve [`install_patroni.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/patroni/install_patroni.sh) script dosyaları ile herbir patroni makinasında PostgreSQL ve Patroni kurulumu yapılır. `setup_patroni.sh` ile de patroni konfigürasyonları yapılır. Bu script dosyasını kullanırken `NODEIP` ve `NAME` değişkenlerinin kurulum yapılan makinaya özel olarak ayarladığınızdan emin olun.
+[`install_pg.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/postgres/install_pg.sh) ve [`install_patroni.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/patroni/install_patroni.sh) script dosyaları ile herbir patroni makinasında PostgreSQL ve Patroni kurulumu yapılır. [`setup_patroni.sh`](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/scripts/patroni/setup_patroni.sh) ile de patroni konfigürasyonları yapılır. Bu script dosyasını kullanırken `NODEIP` ve `NAME` değişkenlerinin kurulum yapılan makinaya özel olarak ayarladığınızdan emin olun.
 
 Herbir makinada kurulum yapıldıktan sonra sırayla Patroni servisleri başlatılır. Patroni clusterı başlatılmadan önce consul clusterının sağlıklo çalıştığından emin olun.
 ```sh
