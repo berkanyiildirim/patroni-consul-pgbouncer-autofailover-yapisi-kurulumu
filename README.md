@@ -5,7 +5,7 @@
 [Consul](https://www.consul.io); service discovery, distributed key-value store, health checking özellikleriyle kendini tanımlayan high available bir DevOps ürünü olarak ifade edilebilir. Node’lar üzerinde konumlanan, server veya client moddaki agentlar ile çalışan Consul, node’un ve kendine tanımlanmış servislerin sağlık durumlarını gözlemler, dağıtık olarak anahtar-değer ikililerini muhafaza ve servis eder, dinamik servislerin mevcut konumlarını (en temel haliyle IP:PORT olarak ifade edilebilir) bilir ve talep karşılığında iletir. Ayrıca, consul-template aracı ile de dinamik konfigürasyon yönetimleri sağlar.
 
 ## Test Ortamı için Kurulan Yapı
-![Test Ortamı için Kurulan Yapı](/images/patroni-consul.png)
+![Test Ortamı için Kurulan Yapı](https://github.com/berkanyiildirim/patroni-consul-pgbouncer-autofailover-yapisi-kurulumu/blob/master/images/patroni-consul.png)
 
 Çalışma kapsamında genel kullanım olan Patroni+ETCD ikilisi yerine DCS aracı olarak Consul tercih edilmiştir. Büyük sistemlerde kullanımı gerekli olan pgBouncer connection pooler aracının patroni lider değişiminde konfigürasyon ayarlarını güncellemek için consul-template kullanılmış ve patroni + [pgbouncer](https://www.pgbouncer.org) + consul + [consul-template](https://github.com/hashicorp/consul-template) yapısı test edilmiştir. 
 
